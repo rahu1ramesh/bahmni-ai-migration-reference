@@ -1,0 +1,3 @@
+[submodule "standard-config"]
+	path = standard-config
+	url = git@github.com:Bahmni/standard-config.git
