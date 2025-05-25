@@ -28,34 +28,41 @@ yarn
 ### Detailed Setup Guide
 
 For a comprehensive setup guide including development environments, Docker configuration, authentication setup, and troubleshooting, please refer to our [Setup Guide](docs/setup-guide.md).
+Certainly. Here's a more formal and grammatically correct version of the provided project README section:
 
-### Development
+### Development Instructions
 
-```bash
-# Start the development server
-yarn start
-```
+To begin local development, follow the steps below:
 
-This will start the development server at [http://localhost:3000](http://localhost:3000).
+1. **Start the Development Server**
 
-### Building for Production
+   ```bash
+   yarn start
+   ```
 
-```bash
-# Build the application
-yarn build
-```
+   This will launch the development server at [http://localhost:3000](http://localhost:3000).
 
-The build artifacts will be stored in the `dist/` directory.
+2. **Start Bahmni Standard Locally**
 
-### Linting
+   In a separate terminal, start the Bahmni standard environment using Docker:
 
-```bash
-# Run ESLint to check for code quality issues
-yarn lint
+   ```bash
+   docker compose up -d
+   ```
 
-# Fix ESLint issues automatically
-yarn lint:fix
-```
+3. **Access the New Clinical Dashboard**
+
+   Once Bahmni is running:
+
+   - Register a new patient through the Bahmni interface.
+   - Copy the patient's UUID from the URL.
+   - Navigate to the following URL in your browser, replacing `{uuid}` with the actual patient UUID:
+
+     ```browser
+     http://localhost:3000/clinical/{uuid}
+     ```
+
+   This will load the new clinical dashboard for the selected patient.
 
 ## Project Structure
 
