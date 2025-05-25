@@ -5,6 +5,7 @@
 The prescription display control (also known as "treatments" in the codebase) is a core component of Bahmni's clinical dashboard that manages and displays medication prescriptions. It provides a comprehensive interface for viewing and managing patient medications, supporting both inpatient and outpatient prescription workflows.
 
 ### Key Features
+
 - Medication order management
 - Support for both coded and non-coded drugs
 - Flexible display options (flowsheet/list views)
@@ -59,6 +60,7 @@ The display control is configured through the clinical dashboard configuration:
 ```
 
 ### Configuration Parameters
+
 - `showFlowSheet`: Enables timeline view of medications
 - `showListView`: Enables list view of medications
 - `showRoute`: Displays medication administration route
@@ -91,7 +93,7 @@ interface DrugOrder {
   durationUnits: string;
   quantity: number;
   quantityUnits: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'DISCONTINUED';
+  status: "ACTIVE" | "COMPLETED" | "DISCONTINUED";
   effectiveStartDate: Date;
   effectiveStopDate?: Date;
   orderReasonConcept?: {
@@ -114,6 +116,7 @@ interface DrugOrderViewModel extends DrugOrder {
 The prescription display control maps to FHIR R4 resources:
 
 ### MedicationRequest Resource
+
 ```typescript
 interface FHIRMedicationRequest {
   resourceType: "MedicationRequest";
@@ -143,6 +146,7 @@ interface FHIRMedicationRequest {
 ```
 
 ### Medication Resource
+
 ```typescript
 interface FHIRMedication {
   resourceType: "Medication";
@@ -168,6 +172,7 @@ interface FHIRMedication {
 ### Key Endpoints
 
 1. Drug Orders API:
+
 ```
 GET /openmrs/ws/rest/v1/bahmnicore/drugOrders
   ?patientUuid={uuid}
@@ -176,6 +181,7 @@ GET /openmrs/ws/rest/v1/bahmnicore/drugOrders
 ```
 
 2. FHIR Endpoints:
+
 ```
 GET /openmrs/ws/fhir2/R4/MedicationRequest?patient={uuid}
 POST /openmrs/ws/fhir2/R4/MedicationRequest
@@ -187,11 +193,13 @@ GET /openmrs/ws/fhir2/R4/Medication/{id}
 The display control implements several error handling mechanisms:
 
 1. **Drug Order Validation**
+
    - Duplicate order detection
    - Drug-drug interaction checking
    - Dosage range validation
 
 2. **Error States**
+
    ```typescript
    interface DrugOrderError {
      message: string;
@@ -206,69 +214,49 @@ The display control implements several error handling mechanisms:
    - Authorization errors
    - Network connectivity issues
 
-## 8. Performance Considerations
-
-1. **Data Loading**
-   - Lazy loading of historical prescriptions
-   - Caching of frequently accessed drug data
-   - Batch loading of drug orders
-
-2. **Optimization Techniques**
-   - Debounced drug search
-   - Paginated order history
-   - Memoized drug order calculations
-
-## 9. Security Features
-
-1. **Access Control**
-   - Role-based access control for prescription management
-   - Audit logging of prescription activities
-   - Digital signature support for prescriptions
-
-2. **Data Validation**
-   - Input sanitization
-   - CSRF protection
-   - Session management
-
 ## 10. Testing Guidelines
 
 For the React + TypeScript implementation over OpenMRS FHIR, consider the following test scenarios:
 
 ### 1. Data Fetching Hook Tests
+
 ```typescript
-describe('useMedications', () => {
-  test('should fetch active medications');
-  test('should handle loading state');
-  test('should handle error state');
-  test('should update cache on medication changes');
+describe("useMedications", () => {
+  test("should fetch active medications");
+  test("should handle loading state");
+  test("should handle error state");
+  test("should update cache on medication changes");
 });
 ```
 
 ### 2. FHIR Service Tests
+
 ```typescript
-describe('MedicationService', () => {
-  test('should convert OpenMRS drug order to FHIR MedicationRequest');
-  test('should handle FHIR search responses');
-  test('should manage medication status transitions');
+describe("MedicationService", () => {
+  test("should convert OpenMRS drug order to FHIR MedicationRequest");
+  test("should handle FHIR search responses");
+  test("should manage medication status transitions");
 });
 ```
 
 ### 3. Component Tests
+
 ```typescript
-describe('MedicationTable', () => {
-  test('should render active medications');
-  test('should display medication details');
-  test('should handle medication actions');
-  test('should implement sorting and filtering');
+describe("MedicationTable", () => {
+  test("should render active medications");
+  test("should display medication details");
+  test("should handle medication actions");
+  test("should implement sorting and filtering");
 });
 ```
 
 ### 4. Error Handling Tests
+
 ```typescript
-describe('ErrorBoundary', () => {
-  test('should catch and display API errors');
-  test('should handle network timeouts');
-  test('should provide retry mechanisms');
+describe("ErrorBoundary", () => {
+  test("should catch and display API errors");
+  test("should handle network timeouts");
+  test("should provide retry mechanisms");
 });
 ```
 
@@ -277,16 +265,19 @@ describe('ErrorBoundary', () => {
 When migrating to the new React + TypeScript implementation:
 
 1. **Data Migration**
+
    - Map legacy drug orders to FHIR resources
    - Preserve historical prescription data
    - Maintain audit trails
 
 2. **Feature Parity**
+
    - Implement all existing display options
    - Maintain current workflow support
    - Preserve configuration flexibility
 
 3. **Performance Requirements**
+
    - Match or exceed current response times
    - Optimize network requests
    - Implement efficient caching
