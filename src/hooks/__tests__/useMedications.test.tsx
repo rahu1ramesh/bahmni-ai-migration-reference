@@ -1,52 +1,22 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useMedications } from '../useMedications';
+import { useMedications } from '../../hooks/useMedications';
 import {
   getMedicationRequestBundle,
   getMedicationRequests,
   formatMedications,
 } from '../../services/medicationService';
-import { MedicationStatus } from '../../types/medication';
+import { mockMedications, mockMedicationRequest, mockMedicationRequestBundle } from '../../__mocks__/medicationMocks';
 
 jest.mock('../../services/medicationService');
 
 describe('useMedications', () => {
   const mockPatientUUID = 'test-patient-uuid';
-  const mockMedicationRequest = {
-    id: 'test-med-request',
-    status: MedicationStatus.Active,
-    display: 'Test Medication',
-    dosage: {
-      value: 1,
-      unit: 'tablet',
-    },
-    route: 'Oral',
-    frequency: '1 time(s) per day',
-    duration: '7 day(s)',
-    prescribedDate: '2023-01-01T10:00:00Z',
-    provider: 'Dr. Test',
-    reason: 'Test Reason',
-    notes: ['Test Note'],
-    administrationInstructions: 'Take with water',
-  };
-
-  const mockBundle = {
-    resourceType: 'Bundle',
-    id: 'test-bundle',
-    type: 'searchset',
-    total: 1,
-    entry: [
-      {
-        fullUrl: 'test-url',
-        resource: mockMedicationRequest,
-      },
-    ],
-  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getMedicationRequestBundle as jest.Mock).mockResolvedValue(mockBundle);
+    (getMedicationRequestBundle as jest.Mock).mockResolvedValue(mockMedicationRequestBundle);
     (getMedicationRequests as jest.Mock).mockReturnValue([mockMedicationRequest]);
-    (formatMedications as jest.Mock).mockReturnValue([mockMedicationRequest]);
+    (formatMedications as jest.Mock).mockReturnValue([mockMedications[0]]);
   });
 
   it('should fetch and format medications on mount', async () => {
@@ -60,7 +30,7 @@ describe('useMedications', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.medications).toEqual([mockMedicationRequest]);
+    expect(result.current.medications).toEqual([mockMedications[0]]);
     expect(result.current.error).toBeNull();
     expect(getMedicationRequestBundle).toHaveBeenCalledWith(mockPatientUUID);
   });

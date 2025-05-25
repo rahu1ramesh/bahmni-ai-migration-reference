@@ -1,62 +1,24 @@
-import { getMedicationRequestBundle, getMedicationRequests, formatMedications } from '../medicationService';
-import { get } from '../api';
-import { notificationService } from '../notificationService';
-import { MedicationStatus } from '@types/medication';
+import {
+  getMedicationRequestBundle,
+  getMedicationRequests,
+  formatMedications,
+} from '../../services/medicationService';
+import { get } from '../../services/api';
+import { notificationService } from '../../services/notificationService';
+import { MedicationStatus, FHIRMedicationRequest } from '../../types/medication';
+import { PATIENT_MEDICATION_REQUEST_URL } from '../../constants/app';
 
-jest.mock('../api');
-jest.mock('../notificationService');
+jest.mock('../../services/api');
+jest.mock('../../services/notificationService');
 
 describe('medicationService', () => {
   const mockPatientUUID = 'test-patient-uuid';
-  const mockMedicationRequest = {
-    resourceType: 'MedicationRequest',
-    id: 'test-med-request',
-    status: MedicationStatus.Active,
-    intent: 'order',
-    medicationCodeableConcept: {
-      text: 'Test Medication',
-      coding: [{ display: 'Test Med Coding' }]
-    },
-    subject: { reference: `Patient/${mockPatientUUID}` },
-    authoredOn: '2023-01-01T10:00:00Z',
-    requester: { display: 'Dr. Test' },
-    reasonCode: [{ text: 'Test Reason' }],
-    note: [{ text: 'Test Note' }],
-    dosageInstruction: [{
-      text: 'Take with water',
-      timing: {
-        repeat: {
-          frequency: 1,
-          period: 1,
-          periodUnit: 'day'
-        }
-      },
-      route: { text: 'Oral' },
-      doseAndRate: [{
-        doseQuantity: {
-          value: 1,
-          unit: 'tablet'
-        }
-      }]
-    }],
-    dispenseRequest: {
-      validityPeriod: {
-        start: '2023-01-01T00:00:00Z',
-        end: '2023-01-08T00:00:00Z'
-      }
-    }
-  };
+  const {
+    mockMedicationRequest,
+    mockMedicationRequestBundle,
+  } = require('../../__mocks__/medicationMocks');
 
-  const mockBundle = {
-    resourceType: 'Bundle',
-    id: 'test-bundle',
-    type: 'searchset',
-    total: 1,
-    entry: [{
-      fullUrl: 'test-url',
-      resource: mockMedicationRequest
-    }]
-  };
+  const mockBundle = mockMedicationRequestBundle;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -68,15 +30,19 @@ describe('medicationService', () => {
 
       const result = await getMedicationRequestBundle(mockPatientUUID);
 
-      expect(get).toHaveBeenCalledWith(expect.stringContaining(mockPatientUUID));
-      expect(result).toEqual(mockBundle);
+      expect(get).toHaveBeenCalledWith(
+        PATIENT_MEDICATION_REQUEST_URL(mockPatientUUID),
+      );
+      expect(result).toEqual(mockMedicationRequestBundle);
     });
 
     it('should handle errors and show notification', async () => {
       const error = new Error('Network error');
       (get as jest.Mock).mockRejectedValueOnce(error);
 
-      await expect(getMedicationRequestBundle(mockPatientUUID)).rejects.toThrow();
+      await expect(
+        getMedicationRequestBundle(mockPatientUUID),
+      ).rejects.toThrow();
       expect(notificationService.showError).toHaveBeenCalled();
     });
   });
@@ -108,7 +74,7 @@ describe('medicationService', () => {
         status: mockMedicationRequest.status,
         dosage: {
           value: 1,
-          unit: 'tablet'
+          unit: 'tablet',
         },
         route: 'Oral',
         frequency: '1 time(s) per 1 day',
@@ -117,17 +83,17 @@ describe('medicationService', () => {
         provider: mockMedicationRequest.requester.display,
         reason: mockMedicationRequest.reasonCode[0].text,
         notes: ['Test Note'],
-        administrationInstructions: 'Take with water'
+        administrationInstructions: 'Take with water',
       });
     });
 
     it('should handle missing optional fields', () => {
-      const minimalRequest = {
+      const minimalRequest: FHIRMedicationRequest = {
         resourceType: 'MedicationRequest',
         id: 'minimal-request',
         status: MedicationStatus.Active,
         intent: 'order',
-        subject: { reference: `Patient/${mockPatientUUID}` }
+        subject: { reference: `Patient/${mockPatientUUID}` },
       };
 
       const result = formatMedications([minimalRequest]);
@@ -145,7 +111,7 @@ describe('medicationService', () => {
         provider: undefined,
         reason: undefined,
         notes: undefined,
-        administrationInstructions: undefined
+        administrationInstructions: undefined,
       });
     });
 
