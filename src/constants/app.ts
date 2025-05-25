@@ -5,5 +5,7 @@ export const PATIENT_CONDITION_RESOURCE_URL = (patientUUID: string) =>
   OPENMRS_FHIR_R4 + `/Condition?patient=${patientUUID}`;
 export const PATIENT_ALLERGY_RESOURCE_URL = (patientUUID: string) =>
   OPENMRS_FHIR_R4 + `/AllergyIntolerance?patient=${patientUUID}`;
+export const PATIENT_MEDICATION_REQUEST_URL = (patientUUID: string) =>
+  OPENMRS_FHIR_R4 + `/MedicationRequest?patient=${patientUUID}&_include=MedicationRequest:medication`;
 
 export const loginPath = '/bahmni/home/index.html#/login';
